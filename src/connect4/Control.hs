@@ -12,16 +12,16 @@ import Model.Player
 -------------------------------------------------------------------------------
 
 control :: State -> BrickEvent n Tick -> EventM n (Next State)
+control s (T.VtyEvent (V.EvKey V.KEsc _)) = Brick.halt s -- Esc to Quit Game anytime
 control s@(Play p) ev = case ev of 
   AppEvent Tick                   -> Brick.continue s
   T.VtyEvent (V.EvKey V.KEnter _) -> nextGameS p =<< liftIO (play p)
   T.VtyEvent (V.EvKey V.KLeft _)  -> Brick.continue (Play (move left p))
   T.VtyEvent (V.EvKey V.KRight _) -> Brick.continue (Play (move right p))
-  T.VtyEvent (V.EvKey V.KEsc _)   -> Brick.halt s
   _                               -> Brick.continue s -- Brick.halt s
-control MainMenu ev = case ev of 
-  T.VtyEvent (V.EvKey V.KEnter _) -> Brick.continue (Play $ Model.init 3)
-  _                               -> Brick.continue MainMenu -- Brick.halt s
+control s@(MainMenu _) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KEnter _) -> Brick.continue (Play $ Model.initGame 3)
+  _                               -> Brick.continue s -- Brick.halt s
 control s _ = Brick.continue s
 
 -------------------------------------------------------------------------------
@@ -47,8 +47,9 @@ getStrategy B s = plStrat (psB s)
 -------------------------------------------------------------------------------
 nextGameS :: PlayState -> Result Board -> EventM n (Next State)
 -------------------------------------------------------------------------------
-nextGameS s b = case next s b of
-  Right s' -> continue (Play s')
-  Left res -> halt (Play $ s { psResult = res }) 
+nextGameS s r = case r of
+  Retry  -> continue (Play s)
+  Cont b -> continue (Play $ s {psBoard = b, psTurn = (flipRB $ psTurn s)})
+  _      -> continue (EndMenu (initEndMenu 0))
 
 

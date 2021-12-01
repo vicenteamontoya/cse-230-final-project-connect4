@@ -15,11 +15,7 @@ view :: State -> [Widget String]
 -------------------------------------------------------------------------------
 view s = case s of
   Play p -> [viewGame p]
-  MainMenu -> mainMenuView
-  _ -> []
-
-mainMenuView :: [Widget String]
-mainMenuView = [strWrap "main menu demo"]
+  _ -> [strWrap "placeholder"]
 
 viewGame :: PlayState -> Widget String
 viewGame s = 

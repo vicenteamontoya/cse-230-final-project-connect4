@@ -18,7 +18,6 @@ executable connect4
                        Control,
                        Model, 
                        Model.Board,
-                       Model.Score,
                        Model.Player
 		       
   default-language:    Haskell2010
