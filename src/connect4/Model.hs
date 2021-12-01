@@ -29,13 +29,13 @@ data PlayState = PS
   , psCol    :: Int             -- ^ current cursor
   }
 
-initGame :: Int -> PlayState
-initGame n = PS 
+initGame :: PlayState
+initGame = PS 
   { psR      = Player.human
   , psB      = Player.human
   , psBoard  = Board.init
   , psTurn   = Board.R
-  , psCol    = 1
+  , psCol    = Board.dim `div` 2
   }
 
 data EndMenuState = EMS

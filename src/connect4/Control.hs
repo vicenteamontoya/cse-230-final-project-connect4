@@ -20,7 +20,7 @@ control s@(Play p) ev = case ev of
   T.VtyEvent (V.EvKey V.KRight _) -> Brick.continue (Play (move right p))
   _                               -> Brick.continue s -- Brick.halt s
 control s@(MainMenu _) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KEnter _) -> Brick.continue (Play $ Model.initGame 3)
+  T.VtyEvent (V.EvKey V.KEnter _) -> Brick.continue (Play $ Model.initGame)
   _                               -> Brick.continue s -- Brick.halt s
 control s _ = Brick.continue s
 
