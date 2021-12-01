@@ -18,7 +18,12 @@ executable connect4
                        Control,
                        Model, 
                        Model.Board,
-                       Model.Player
+                       Model.Player,
+                       UI.MainMenu,
+                       UI.Instructions,
+                       UI.Loading,
+                       UI.Play,
+                       UI.EndMenu
 		       
   default-language:    Haskell2010
   ghc-options:       -W -threaded
