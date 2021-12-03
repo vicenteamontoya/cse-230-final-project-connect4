@@ -1,7 +1,6 @@
 module Main where
 
 import Brick
-import Graphics.Vty.Attributes
 import qualified Graphics.Vty as V
 import Brick.BChan (newBChan, writeBChan)
 import Control.Monad (forever)
@@ -10,6 +9,7 @@ import Control.Concurrent (threadDelay, forkIO)
 import Model
 import View 
 import Control 
+import UI.Resources
 
 -------------------------------------------------------------------------------
 main :: IO ()
@@ -29,5 +29,5 @@ app = App
   , appChooseCursor = const . const Nothing
   , appHandleEvent  = control 
   , appStartEvent   = return
-  , appAttrMap      = const (attrMap defAttr [])
+  , appAttrMap      = const theMap
   }

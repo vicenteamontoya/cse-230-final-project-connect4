@@ -3,24 +3,29 @@ module UI.Play (view) where
 import Brick
 import Brick.Widgets.Center (center)
 import Brick.Widgets.Border (borderWithLabel, hBorder, vBorder)
-import Brick.Widgets.Border.Style (unicode)
+import Brick.Widgets.Border.Style
 import Text.Printf (printf)
 
 import Model
 import Model.Board
 import Graphics.Vty hiding (dim)
 
+import UI.Resources
+
 view :: PlayState -> [Widget String]
 view s = [v]
-  where v = withBorderStyle unicode $
-              borderWithLabel (str (header s)) $
-                vTile [ mkRow s row | row <- [1..dim] ]
+  where v = name <=> (withBorderStyle unicodeBold $
+              borderWithLabel (header s) $
+              vTile ((vLimit cellHeight) <$> ([ mkRow s row | row <- [1..height] ])))
 
-header :: PlayState -> String
-header s = printf "Connect4 Turn = %s, col = %d" (show (psTurn s)) (psCol s)
+header :: PlayState -> Widget n
+header s =  str (printf "Connect4 Turn = %s, col = %d" (show (psTurn s)) (psCol s))
+
+name :: Widget n
+name = center (vBox (str <$> (split title newline)))
 
 mkRow :: PlayState -> Int -> Widget n
-mkRow s row = hTile [ mkCell s row i | i <- [1..dim] ]
+mkRow s row = hTile [ mkCell s row i | i <- [1..width] ]
 
 mkCell :: PlayState -> Int -> Int -> Widget n
 mkCell s r c 
@@ -29,36 +34,23 @@ mkCell s r c
   where
     raw = mkCell' s r c
 
-withCursor :: Widget n -> Widget n
-withCursor = modifyDefAttr (`withStyle` reverseVideo)
-
 mkCell' :: PlayState -> Int -> Int -> Widget n
--- mkCell' _ r c = center (str (printf "(%d, %d)" r c))
-mkCell' s r c = center (mkXO xoMb)
+mkCell' s r c = center (mkDisc disc)
   where 
-    xoMb      = psBoard s ! Pos r c
-    -- xoMb 
-    --   | r == c    = Just X 
-    --   | r > c     = Just O 
-    --   | otherwise = Nothing
+    disc      = psBoard s ! Pos r c
 
-mkXO :: Maybe RB -> Widget n
-mkXO Nothing  = blockB
-mkXO (Just R) = blockRed
-mkXO (Just B) = blockBlue
+withCursor :: Widget n -> Widget n
+withCursor = modifyDefAttr (`withBackColor` gray)
 
-blockB, blockRed, blockBlue :: Widget n
-blockB = vBox (replicate 5 (str "     "))
-blockRed  = vBox [ str "X   X"
-                 , str " X X "
-                 , str "  X  "
-                 , str " X X " 
-                 , str "X   X"]
-blockBlue = vBox [ str "OOOOO"
-                 , str "O   O"
-                 , str "O   O"
-                 , str "O   O"
-                 , str "OOOOO"]
+mkDisc :: Maybe RB -> Widget n
+mkDisc Nothing  = discBlank
+mkDisc (Just R) = discRed
+mkDisc (Just B) = discBlue
+
+discBlank, discRed, discBlue :: Widget n
+discBlank = vBox (replicate 6 (str "     "))
+discRed   = withAttr redAttr (vBox (str <$> (split disc newline)))
+discBlue  = withAttr blueAttr (vBox (str <$> (split disc newline)))
 
 vTile :: [Widget n] -> Widget n
 vTile (b:bs) = vBox (b : [hBorder <=> b | b <- bs])

@@ -35,7 +35,7 @@ initGame = PS
   , psB      = Player.human
   , psBoard  = Board.init
   , psTurn   = Board.R
-  , psCol    = (Board.dim + 1) `div` 2
+  , psCol    = (Board.width + 1) `div` 2
   }
 
 data EndMenuState = EMS

@@ -7,7 +7,8 @@ module Model.Board
   , Result (..)
 
     -- * Board API
-  , dim
+  , height
+  , width
   , (!)
   , init
   , put
@@ -37,8 +38,8 @@ data RB
   deriving (Eq, Show)
 
 data Pos = Pos 
-  { pRow :: Int  -- 1 <= pRow <= dim 
-  , pCol :: Int  -- 1 <= pCol <= dim
+  { pRow :: Int  -- 1 <= pRow <= height 
+  , pCol :: Int  -- 1 <= pCol <= width
   }
   deriving (Eq, Ord)
 
@@ -48,11 +49,14 @@ instance Show Pos where
 (!) :: Board -> Pos -> Maybe RB 
 board ! pos = M.lookup pos board
 
-dim :: Int
-dim = 7
+height :: Int
+height = 6
+
+width :: Int
+width = 7
 
 positions :: [Pos]
-positions = [ Pos r c | r <- [1..dim], c <- [1..dim] ] 
+positions = [ Pos r c | r <- [1..height], c <- [1..width] ] 
 
 emptyPositions :: Board -> [Pos]
 emptyPositions board  = [ p | p <- positions, M.notMember p board]
@@ -80,7 +84,7 @@ put board rb col = case M.lookup (Pos 1 col) board of
 insert :: Board -> Int -> RB -> (Pos, Board)
 insert b col rb = (p, M.insert p rb b)
   where p = Pos row col
-        row = maximum [ i | i <- [1..dim], M.notMember (Pos i col) b ]
+        row = maximum [ i | i <- [1..height], M.notMember (Pos i col) b ]
 
 -- pass position to make check efficient
 result :: RB -> (Pos, Board) -> Result Board
@@ -105,10 +109,9 @@ winPositions p = [ [ Pos (pRow p + i + j) (pCol p) | j <- [0..3] ] | i <- [-3..0
 -- Testing
 -- >>> winPositions (Pos 0 0)
 -- [[(-3,0),(-2,0),(-1,0),(0,0)],[(-2,0),(-1,0),(0,0),(1,0)],[(-1,0),(0,0),(1,0),(2,0)],[(0,0),(1,0),(2,0),(3,0)],[(0,-3),(0,-2),(0,-1),(0,0)],[(0,-2),(0,-1),(0,0),(0,1)],[(0,-1),(0,0),(0,1),(0,2)],[(0,0),(0,1),(0,2),(0,3)],[(-3,-3),(-2,-2),(-1,-1),(0,0)],[(-2,-2),(-1,-1),(0,0),(1,1)],[(-1,-1),(0,0),(1,1),(2,2)],[(0,0),(1,1),(2,2),(3,3)],[(-3,3),(-2,2),(-1,1),(0,0)],[(-2,2),(-1,1),(0,0),(1,-1)],[(-1,1),(0,0),(1,-1),(2,-2)],[(0,0),(1,-1),(2,-2),(3,-3)]]
---
 
 isFull :: Board -> Bool
-isFull b = M.size b == dim * dim
+isFull b = M.size b == width * height
 
 -------------------------------------------------------------------------------
 -- | Moves 
@@ -118,7 +121,7 @@ left :: Int -> Int
 left p = max 1 (p - 1) 
 
 right :: Int -> Int 
-right p = min dim (p + 1) 
+right p = min width (p + 1) 
 
 boardWinner :: Result a -> Maybe RB
 boardWinner (Win rb) = Just rb
