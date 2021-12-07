@@ -20,7 +20,7 @@ main = do
     threadDelay 100000 -- decides how fast your game moves
   let buildVty = V.mkVty V.defaultConfig
   initialVty <- buildVty
-  customMain initialVty buildVty (Just chan) app (MainMenu 1)
+  customMain initialVty buildVty (Just chan) app initMainMenu
   return ()
 
 app :: App State Tick String

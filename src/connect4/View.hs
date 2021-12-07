@@ -18,3 +18,4 @@ view s = case s of
   Loading -> L.view
   Instructions -> I.view
   EndMenu e -> E.view e
+  Settings n -> [strWrap $ "settings placeholder. press enter to select option" ++ (show n)]

@@ -20,6 +20,7 @@ data State
   | Instructions
   | Play PlayState
   | EndMenu EndMenuState
+  | Settings Int
   
 data PlayState = PS
   { psR      :: Player.Player   -- ^ player R info
@@ -29,8 +30,13 @@ data PlayState = PS
   , psCol    :: Int             -- ^ current cursor
   }
 
-initGame :: PlayState
-initGame = PS 
+data EndMenuState = EMS
+  { emRes    :: Int             -- ^ game result (change type?)
+  , emSel    :: Int             -- ^ current cursor   
+  } 
+
+initGame :: State
+initGame = Play $ PS 
   { psR      = Player.human
   , psB      = Player.human
   , psBoard  = Board.init
@@ -38,16 +44,26 @@ initGame = PS
   , psCol    = (Board.width + 1) `div` 2
   }
 
-data EndMenuState = EMS
-  { emRes    :: Int             -- ^ game result (change type?)
-  , emSel    :: Int             -- ^ current cursor   
-  } 
+initSettings :: State
+initSettings = Settings 1
 
-initEndMenu :: Int -> EndMenuState
-initEndMenu n = EMS
+initMainMenu :: State
+initMainMenu = MainMenu 1
+
+initEndMenu :: Int -> State
+initEndMenu n = EndMenu $ EMS
   { emRes    = n
   , emSel    = 1 
   } 
+
+mainMenuOptionCount :: Int
+mainMenuOptionCount = 5
+
+endMenuOptionCount :: Int
+endMenuOptionCount = 3
+
+settingsOptionCount :: Int
+settingsOptionCount = 5 --TODO
 
 isCurr :: PlayState -> Int -> Bool
 isCurr s c = (psCol s) == c

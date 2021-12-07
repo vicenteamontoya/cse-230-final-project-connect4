@@ -4,4 +4,4 @@ import Brick
 import Model
 
 view :: EndMenuState -> [Widget String]
-view _ = [strWrap "end menu placeholder. press enter to select option"]
+view (EMS _ n) = [strWrap $ "end menu placeholder. press enter to select option" ++ show n]
