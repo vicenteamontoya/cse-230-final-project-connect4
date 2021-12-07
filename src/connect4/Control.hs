@@ -11,36 +11,36 @@ import Model.Player
 
 -------------------------------------------------------------------------------
 
-control :: State -> BrickEvent n Tick -> EventM n (Next State)
+control :: GlobalState -> BrickEvent n Tick -> EventM n (Next GlobalState)
 control s (T.VtyEvent (V.EvKey V.KEsc _)) = halt s -- Esc to Quit Game anytime
-control s@(Play p) ev = case ev of 
+control s@(GS (Play p) conn sl) ev = case ev of 
   -- AppEvent Tick                   -> continue s
-  T.VtyEvent (V.EvKey V.KEnter _) -> nextGameS p =<< liftIO (play p)
-  T.VtyEvent (V.EvKey V.KLeft _)  -> continue (Play (move left p))
-  T.VtyEvent (V.EvKey V.KRight _) -> continue (Play (move right p))
+  T.VtyEvent (V.EvKey V.KEnter _) -> nextGameS p s =<< liftIO (play p)
+  T.VtyEvent (V.EvKey V.KLeft _)  -> continue s { state = (Play (move left p)) }
+  T.VtyEvent (V.EvKey V.KRight _) -> continue s { state = (Play (move right p)) }
   _                               -> continue s -- halt s
-control s@(MainMenu n) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 5 then halt s else continue (mainMenuSelect n)
-  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue (MainMenu $ keyToInt mainMenuOptionCount n c)
-  T.VtyEvent (V.EvKey V.KDown _)     -> continue (MainMenu ((n `mod` mainMenuOptionCount) + 1))
-  T.VtyEvent (V.EvKey V.KUp _)       -> continue (MainMenu (((n - 2) `mod` mainMenuOptionCount) + 1))
+control s@(GS (MainMenu n) conn sl) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 5 then halt s else continue s { state = (mainMenuSelect n) }
+  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (MainMenu $ keyToInt mainMenuOptionCount n c) }
+  T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (MainMenu ((n `mod` mainMenuOptionCount) + 1)) }
+  T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (MainMenu (((n - 2) `mod` mainMenuOptionCount) + 1)) }
   _                                  -> continue s -- halt s
-control s@(EndMenu (EMS r n)) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 3 then halt s else continue (endMenuSelect n)
-  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue (EndMenu $ EMS r (keyToInt endMenuOptionCount n c))
-  T.VtyEvent (V.EvKey V.KDown _)     -> continue (EndMenu $ EMS r ((n `mod` endMenuOptionCount) + 1))
-  T.VtyEvent (V.EvKey V.KUp _)       -> continue (EndMenu $ EMS r (((n - 2) `mod` endMenuOptionCount) + 1))
+control s@(GS (EndMenu (EMS r n)) conn sl) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 3 then halt s else continue s { state = (endMenuSelect n) }
+  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (EndMenu $ EMS r (keyToInt endMenuOptionCount n c)) }
+  T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (EndMenu $ EMS r ((n `mod` endMenuOptionCount) + 1)) }
+  T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (EndMenu $ EMS r (((n - 2) `mod` endMenuOptionCount) + 1)) }
   _                                  -> continue s -- halt s
-control s@(Loading) ev = case ev of 
+control s@(GS Loading conn sl) ev = case ev of 
   _                                  -> continue s -- halt s
-control s@(Instructions) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KLeft _)  -> continue initMainMenu
+control s@(GS Instructions conn sl) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KLeft _)  -> continue s { state = initMainMenu }
   _                               -> continue s -- halt s  
-control s@(Settings n) ev = case ev of
-  T.VtyEvent (V.EvKey V.KEnter _)    -> continue (settingsSelect n)
-  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue (Settings $ keyToInt settingsOptionCount n c)
-  T.VtyEvent (V.EvKey V.KDown _)     -> continue (Settings ((n `mod` settingsOptionCount) + 1))
-  T.VtyEvent (V.EvKey V.KUp _)       -> continue (Settings (((n - 2) `mod` settingsOptionCount) + 1))
+control s@(GS (Settings n) conn sl) ev = case ev of
+  T.VtyEvent (V.EvKey V.KEnter _)    -> continue s { state = (settingsSelect n) }
+  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (Settings $ keyToInt settingsOptionCount n c) }
+  T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (Settings ((n `mod` settingsOptionCount) + 1)) }
+  T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (Settings (((n - 2) `mod` settingsOptionCount) + 1)) }
   _                                  -> continue s -- halt s
 
 -------------------------------------------------------------------------------
@@ -64,12 +64,12 @@ getStrategy R s = plStrat (psR s)
 getStrategy B s = plStrat (psB s)
 
 -------------------------------------------------------------------------------
-nextGameS :: PlayState -> Result Board -> EventM n (Next State)
+nextGameS :: PlayState -> GlobalState -> Result Board -> EventM n (Next GlobalState)
 -------------------------------------------------------------------------------
-nextGameS s r = case r of
-  Retry  -> continue (Play s)
-  Cont b -> continue (Play $ s {psBoard = b, psTurn = (flipRB $ psTurn s)})
-  _      -> continue (initEndMenu 0) -- implement result to int
+nextGameS p s r = case r of
+  Retry  -> continue s { state = (Play p) }
+  Cont b -> continue s { state = (Play $ p {psBoard = b, psTurn = (flipRB $ psTurn p)}) }
+  _      -> continue s { state = (initEndMenu 0) } -- implement result to int
 
 mainMenuSelect :: Int -> State
 mainMenuSelect n = case n of
@@ -88,10 +88,9 @@ endMenuSelect n = case n of
 settingsSelect :: Int -> State
 settingsSelect n = case n of
   1 -> initMainMenu -- Back to main menu
-  2 -> initMainMenu -- TODO update setting 1
-  3 -> initMainMenu -- update setting 2
-  4 -> initMainMenu -- update setting 3
-  5 -> initMainMenu -- update setting 4
+  2 -> initMainMenu -- TODO update colors
+  3 -> initMainMenu -- update chars
+  4 -> initMainMenu -- update shape
   _ -> initMainMenu -- Impossible State
   
 -- Args: max value, default value, char

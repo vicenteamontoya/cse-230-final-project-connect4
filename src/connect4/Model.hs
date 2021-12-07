@@ -2,6 +2,8 @@
 module Model where 
 
 import Prelude hiding ((!!))
+import qualified Network.WebSockets as WS
+
 import qualified Model.Board  as Board
 import qualified Model.Player as Player
 
@@ -13,6 +15,12 @@ data Tick = Tick
 -------------------------------------------------------------------------------
 -- | Top-level App State ------------------------------------------------------
 -------------------------------------------------------------------------------
+
+data GlobalState = GS
+  { state    :: State
+  , conn     :: WS.Connection
+  , setting  :: SettingsList
+  }
 
 data State 
   = MainMenu Int
@@ -35,6 +43,12 @@ data EndMenuState = EMS
   , emSel    :: Int             -- ^ current cursor   
   } 
 
+data SettingsList = SL
+  { colorScheme :: Int
+  , diskChar    :: Char
+  , diskShape   :: Int
+  }
+
 initGame :: State
 initGame = Play $ PS 
   { psR      = Player.human
@@ -54,7 +68,14 @@ initEndMenu :: Int -> State
 initEndMenu n = EndMenu $ EMS
   { emRes    = n
   , emSel    = 1 
-  } 
+  }
+
+initSettingsList :: SettingsList
+initSettingsList = SL
+  { colorScheme = 1
+  , diskChar    = '*' 
+  , diskShape   = 1
+  }
 
 mainMenuOptionCount :: Int
 mainMenuOptionCount = 5
@@ -63,7 +84,7 @@ endMenuOptionCount :: Int
 endMenuOptionCount = 3
 
 settingsOptionCount :: Int
-settingsOptionCount = 5 --TODO
+settingsOptionCount = 4
 
 isCurr :: PlayState -> Int -> Bool
 isCurr s c = (psCol s) == c

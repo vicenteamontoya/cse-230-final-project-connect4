@@ -10,9 +10,9 @@ import qualified UI.Play as P
 import qualified UI.EndMenu as E
 
 -------------------------------------------------------------------------------
-view :: State -> [Widget String]
+view :: GlobalState -> [Widget String]
 -------------------------------------------------------------------------------
-view s = case s of
+view gs@(GS st _ sl) = case st of
   Play p -> P.view p
   MainMenu n -> M.view n
   Loading -> L.view
