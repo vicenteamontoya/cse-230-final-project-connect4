@@ -46,7 +46,7 @@ data EndMenuState = EMS
 
 data SettingsList = SL
   { colorScheme :: Int
-  , diskChar    :: Char
+  , diskChar    :: Int
   , diskShape   :: Int
   }
 
@@ -83,7 +83,7 @@ initEndMenu n = EndMenu $ EMS
 initSettingsList :: SettingsList
 initSettingsList = SL
   { colorScheme = 1
-  , diskChar    = '*' 
+  , diskChar    = 1
   , diskShape   = 1
   }
 

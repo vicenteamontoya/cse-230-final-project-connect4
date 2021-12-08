@@ -9,6 +9,7 @@ import Data.Text
 
 import Model
 import Model.Board
+import View
 
 -------------------------------------------------------------------------------
 
@@ -16,11 +17,11 @@ control :: GlobalState -> BrickEvent n Tick -> EventM n (Next GlobalState)
 control s (T.VtyEvent (V.EvKey V.KEsc _)) = halt s -- Esc to Quit Game anytime
 control s@(GS (Play p) conn _) ev = case ev of
   AppEvent (Tick "LEFT")             -> continue s { state = (initEndMenu (-1)) } -- Other player leaves
-  AppEvent (Tick msg)                -> nextGameS p s $ playServer p (read msg)
+  AppEvent (Tick msg)                -> nextGameS p s $ playServer p (read msg) -- Receive column number
   T.VtyEvent (V.EvKey V.KEnter _)    -> case play p of
     Retry -> continue s
     _     -> do
-      liftIO $ WS.sendTextData conn (pack $ show $ psCol p)
+      liftIO $ WS.sendTextData conn (pack $ show $ psCol p) -- Send column number
       nextGameS p s $ play p
   T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = (Play (move left p)) }
   T.VtyEvent (V.EvKey V.KRight _)    -> continue s { state = (Play (move right p)) }
@@ -48,8 +49,8 @@ control s@(GS Loading _ _) ev = case ev of
 control s@(GS Instructions _ _) ev = case ev of 
   T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = initMainMenu }
   _                                  -> continue s 
-control s@(GS (Settings n) _ sl) ev = case ev of
-  T.VtyEvent (V.EvKey V.KEnter _)    -> continue s { state = (settingsSelect n) }
+control s@(GS (Settings n) _ _) ev = case ev of
+  T.VtyEvent (V.EvKey V.KEnter _)    -> continue (settingsSelect s n)
   T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (Settings $ keyToInt settingsOptionCount n c) }
   T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (Settings ((n `mod` settingsOptionCount) + 1)) }
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (Settings (((n - 2) `mod` settingsOptionCount) + 1)) }
@@ -105,13 +106,13 @@ endMenuSelect n = case n of
   2 -> initSettings
   _ -> initMainMenu -- Impossible State (Quit at 3 handled above)
 
-settingsSelect :: Int -> State
-settingsSelect n = case n of
-  1 -> initMainMenu -- Back to main menu
-  2 -> initMainMenu -- TODO update colors
-  3 -> initMainMenu -- TODO update chars
-  4 -> initMainMenu -- TODO update shape
-  _ -> initMainMenu -- Impossible State
+settingsSelect :: GlobalState -> Int -> GlobalState
+settingsSelect gs@(GS _ _ sl) n = case n of
+  1 -> gs { setting = sl { colorScheme = (((colorScheme sl) `mod` colorSchemeCount) + 1) } } -- update colors
+  2 -> gs { setting = sl { diskChar    = (((diskChar sl) `mod` diskCharCount) + 1) } } -- update chars
+  3 -> gs { setting = sl { diskShape   = (((diskShape sl) `mod` diskShapeCount) + 1) } } -- update shape
+  4 -> gs { state = initMainMenu } -- Back to main menu
+  _ -> gs -- Impossible State
   
 -- Args: max value, default value, char
 keyToInt :: Int -> Int -> Char -> Int

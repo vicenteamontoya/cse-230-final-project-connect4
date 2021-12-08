@@ -1,4 +1,4 @@
-module View (view) where
+module View (view, colorSchemeCount, diskCharCount, diskShapeCount) where
 
 import Brick
 
@@ -19,3 +19,12 @@ view gs@(GS st _ sl) = case st of
   Instructions -> I.view
   EndMenu e -> E.view e
   Settings n -> [strWrap $ "settings placeholder. press enter to select option" ++ (show n)]
+
+colorSchemeCount :: Int
+colorSchemeCount = 5
+
+diskCharCount :: Int
+diskCharCount = 5
+
+diskShapeCount :: Int
+diskShapeCount = 5
