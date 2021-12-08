@@ -3,45 +3,57 @@ module Control where
 import Brick hiding (Result)
 import qualified Graphics.Vty as V
 import qualified Brick.Types as T
+import Control.Monad.IO.Class (MonadIO(liftIO))
+import qualified Network.WebSockets as WS
+import Data.Text
 
 import Model
 import Model.Board
-import Control.Monad.IO.Class (MonadIO(liftIO))
-import Model.Player
 
 -------------------------------------------------------------------------------
 
 control :: GlobalState -> BrickEvent n Tick -> EventM n (Next GlobalState)
 control s (T.VtyEvent (V.EvKey V.KEsc _)) = halt s -- Esc to Quit Game anytime
-control s@(GS (Play p) conn sl) ev = case ev of 
-  -- AppEvent Tick                   -> continue s
-  T.VtyEvent (V.EvKey V.KEnter _) -> nextGameS p s =<< liftIO (play p)
-  T.VtyEvent (V.EvKey V.KLeft _)  -> continue s { state = (Play (move left p)) }
-  T.VtyEvent (V.EvKey V.KRight _) -> continue s { state = (Play (move right p)) }
-  _                               -> continue s -- halt s
-control s@(GS (MainMenu n) conn sl) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 5 then halt s else continue s { state = (mainMenuSelect n) }
+control s@(GS (Play p) conn _) ev = case ev of
+  AppEvent (Tick "LEFT")             -> continue s { state = (initEndMenu (-1)) } -- Other player leaves
+  AppEvent (Tick msg)                -> nextGameS p s $ playServer p (read msg)
+  T.VtyEvent (V.EvKey V.KEnter _)    -> case play p of
+    Retry -> continue s
+    _     -> do
+      liftIO $ WS.sendTextData conn (pack $ show $ psCol p)
+      nextGameS p s $ play p
+  T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = (Play (move left p)) }
+  T.VtyEvent (V.EvKey V.KRight _)    -> continue s { state = (Play (move right p)) }
+  _                                  -> continue s
+control s@(GS (MainMenu n) conn _) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KEnter _)    -> case n of
+    5 -> halt s
+    2 -> do
+      liftIO $ WS.sendTextData conn (pack "PLAY")
+      continue s { state = Loading }
+    _ -> continue s { state = (mainMenuSelect n) }
   T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (MainMenu $ keyToInt mainMenuOptionCount n c) }
   T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (MainMenu ((n `mod` mainMenuOptionCount) + 1)) }
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (MainMenu (((n - 2) `mod` mainMenuOptionCount) + 1)) }
-  _                                  -> continue s -- halt s
-control s@(GS (EndMenu (EMS r n)) conn sl) ev = case ev of 
+  _                                  -> continue s
+control s@(GS (EndMenu (EMS r n)) _ _) ev = case ev of 
   T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 3 then halt s else continue s { state = (endMenuSelect n) }
   T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (EndMenu $ EMS r (keyToInt endMenuOptionCount n c)) }
   T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (EndMenu $ EMS r ((n `mod` endMenuOptionCount) + 1)) }
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (EndMenu $ EMS r (((n - 2) `mod` endMenuOptionCount) + 1)) }
-  _                                  -> continue s -- halt s
-control s@(GS Loading conn sl) ev = case ev of 
-  _                                  -> continue s -- halt s
-control s@(GS Instructions conn sl) ev = case ev of 
-  T.VtyEvent (V.EvKey V.KLeft _)  -> continue s { state = initMainMenu }
-  _                               -> continue s -- halt s  
-control s@(GS (Settings n) conn sl) ev = case ev of
+  _                                  -> continue s
+control s@(GS Loading _ _) ev = case ev of
+  AppEvent (Tick msg)                -> continue s { state = initMultiplayerGame msg }
+  _                                  -> continue s
+control s@(GS Instructions _ _) ev = case ev of 
+  T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = initMainMenu }
+  _                                  -> continue s 
+control s@(GS (Settings n) _ sl) ev = case ev of
   T.VtyEvent (V.EvKey V.KEnter _)    -> continue s { state = (settingsSelect n) }
   T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (Settings $ keyToInt settingsOptionCount n c) }
   T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (Settings ((n `mod` settingsOptionCount) + 1)) }
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (Settings (((n - 2) `mod` settingsOptionCount) + 1)) }
-  _                                  -> continue s -- halt s
+  _                                  -> continue s
 
 -------------------------------------------------------------------------------
 move :: (Int -> Int) -> PlayState -> PlayState
@@ -49,19 +61,26 @@ move :: (Int -> Int) -> PlayState -> PlayState
 move f s = s { psCol = f (psCol s) }
 
 -------------------------------------------------------------------------------
-play :: PlayState -> IO (Result Board)
+play :: PlayState -> Result Board
 -------------------------------------------------------------------------------
-play s
-  | psTurn s == rb = put (psBoard s) rb <$> getCol rb s 
-  | otherwise      = return Retry
-      where rb = psTurn s
+play s = case psTurn s of
+  R -> case psR s of
+    Local  -> put (psBoard s) R (psCol s)
+    Server -> Retry
+  B -> case psB s of
+    Local  -> put (psBoard s) B (psCol s)
+    Server -> Retry
 
-getCol :: RB -> PlayState -> IO Int
-getCol rb s = getStrategy rb s (psCol s) (psBoard s) rb
-
-getStrategy :: RB -> PlayState -> Strategy 
-getStrategy R s = plStrat (psR s)
-getStrategy B s = plStrat (psB s)
+-------------------------------------------------------------------------------
+playServer :: PlayState -> Int -> Result Board
+-------------------------------------------------------------------------------
+playServer s n = case psTurn s of
+  R -> case psR s of
+    Server -> put (psBoard s) R n
+    Local  -> Retry
+  B -> case psB s of
+    Server -> put (psBoard s) B n
+    Local  -> Retry
 
 -------------------------------------------------------------------------------
 nextGameS :: PlayState -> GlobalState -> Result Board -> EventM n (Next GlobalState)
@@ -73,11 +92,10 @@ nextGameS p s r = case r of
 
 mainMenuSelect :: Int -> State
 mainMenuSelect n = case n of
-  1 -> initGame
-  2 -> initGame
+  1 -> initLocalGame
   3 -> Instructions
   4 -> initSettings
-  _ -> initMainMenu -- Impossible State (Quit at 5 handled above)
+  _ -> initMainMenu -- Impossible State (Loading at 2 and Quit at 5 handled above)
 
 endMenuSelect :: Int -> State
 endMenuSelect n = case n of
@@ -89,8 +107,8 @@ settingsSelect :: Int -> State
 settingsSelect n = case n of
   1 -> initMainMenu -- Back to main menu
   2 -> initMainMenu -- TODO update colors
-  3 -> initMainMenu -- update chars
-  4 -> initMainMenu -- update shape
+  3 -> initMainMenu -- TODO update chars
+  4 -> initMainMenu -- TODO update shape
   _ -> initMainMenu -- Impossible State
   
 -- Args: max value, default value, char

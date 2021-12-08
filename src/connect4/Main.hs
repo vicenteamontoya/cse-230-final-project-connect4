@@ -23,8 +23,7 @@ app conn = do
     chan   <- newBChan 10
     forkIO  $ forever $ do
       msg <- WS.receiveData conn
-      putStrLn (unpack msg)
-      writeBChan chan Tick
+      writeBChan chan (Tick (unpack msg))
 
     let buildVty = V.mkVty V.defaultConfig
     initialVty <- buildVty

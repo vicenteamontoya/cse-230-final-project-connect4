@@ -1,16 +1,15 @@
 {-# LANGUAGE RecordWildCards #-}
 module Model where 
 
-import Prelude hiding ((!!))
+import Prelude
 import qualified Network.WebSockets as WS
 
 import qualified Model.Board  as Board
-import qualified Model.Player as Player
 
 -------------------------------------------------------------------------------
 -- | Ticks mark passing of time: a custom event that we constantly stream
 -------------------------------------------------------------------------------
-data Tick = Tick
+data Tick = Tick String
 
 -------------------------------------------------------------------------------
 -- | Top-level App State ------------------------------------------------------
@@ -31,12 +30,14 @@ data State
   | Settings Int
   
 data PlayState = PS
-  { psR      :: Player.Player   -- ^ player R info
-  , psB      :: Player.Player   -- ^ player B info
+  { psR      :: Player   -- ^ player R info
+  , psB      :: Player   -- ^ player B info
   , psBoard  :: Board.Board     -- ^ current board
   , psTurn   :: Board.RB        -- ^ whose turn 
   , psCol    :: Int             -- ^ current cursor
   }
+
+data Player = Local | Server
 
 data EndMenuState = EMS
   { emRes    :: Int             -- ^ game result (change type?)
@@ -49,10 +50,19 @@ data SettingsList = SL
   , diskShape   :: Int
   }
 
-initGame :: State
-initGame = Play $ PS 
-  { psR      = Player.human
-  , psB      = Player.human
+initLocalGame :: State
+initLocalGame = Play $ PS 
+  { psR      = Local
+  , psB      = Local
+  , psBoard  = Board.init
+  , psTurn   = Board.R
+  , psCol    = (Board.width + 1) `div` 2
+  }
+
+initMultiplayerGame :: String -> State
+initMultiplayerGame str = Play $ PS 
+  { psR      = if str == "R" then Local else Server
+  , psB      = if str == "B" then Local else Server
   , psBoard  = Board.init
   , psTurn   = Board.R
   , psCol    = (Board.width + 1) `div` 2
