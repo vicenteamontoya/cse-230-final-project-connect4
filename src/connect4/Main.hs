@@ -16,7 +16,7 @@ import UI.Resources
 
 -------------------------------------------------------------------------------
 main :: IO ()
-main = withSocketsDo $ WS.runClient "echo.websocket.org" 80 "/" app --TODO update host, port, path
+main = withSocketsDo $ WS.runClient "127.0.0.1" 9160 "/" app --TODO update host, port, path
 
 app :: WS.ClientApp ()
 app conn = do

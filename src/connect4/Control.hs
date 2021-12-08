@@ -88,7 +88,9 @@ nextGameS :: PlayState -> GlobalState -> Result Board -> EventM n (Next GlobalSt
 nextGameS p s r = case r of
   Retry  -> continue s { state = (Play p) }
   Cont b -> continue s { state = (Play $ p {psBoard = b, psTurn = (flipRB $ psTurn p)}) }
-  _      -> continue s { state = (initEndMenu 0) } -- implement result to int
+  Draw   -> continue s { state = (initEndMenu 0) } -- Draw is 0
+  Win R  -> continue s { state = (initEndMenu 1) } -- Red win is 1
+  Win B  -> continue s { state = (initEndMenu 2) } -- Blue win is 2, other player left so you win is -1
 
 mainMenuSelect :: Int -> State
 mainMenuSelect n = case n of

@@ -21,7 +21,6 @@ executable connect4
                        Control,
                        Model, 
                        Model.Board,
-                       Model.Player,
                        UI.MainMenu,
                        UI.Instructions,
                        UI.Loading,

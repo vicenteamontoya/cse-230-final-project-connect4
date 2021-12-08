@@ -2,3 +2,8 @@
 *~
 .stack-work/
 stack.yaml.lock
+*.hi
+*.o
+websocket_test/server
+websocket_test/testingserver
+websocket_test/client
