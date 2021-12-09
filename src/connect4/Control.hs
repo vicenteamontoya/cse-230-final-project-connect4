@@ -29,7 +29,7 @@ control s@(GS (Play p) conn _) ev = case ev of
 control s@(GS (MainMenu n) conn _) ev = case ev of
   T.VtyEvent (V.EvKey V.KEnter _)    -> case n of
     4 -> halt s
-    3 -> do
+    1 -> do
       liftIO $ WS.sendTextData conn (pack "PLAY")
       continue s { state = Loading }
     _ -> continue s { state = (mainMenuSelect n) }
@@ -47,13 +47,14 @@ control s@(GS Loading _ _) ev = case ev of
   AppEvent (Tick msg)                -> continue s { state = initMultiplayerGame msg }
   _                                  -> continue s
 control s@(GS Instructions _ _) ev = case ev of
-  T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = initMainMenu }
+  T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = MainMenu 2 }
   _                                  -> continue s
 control s@(GS (Settings n) _ _) ev = case ev of
+  T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = MainMenu 3 }
   T.VtyEvent (V.EvKey V.KEnter _)    -> continue (settingsSelect s n)
-  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = (Settings $ keyToInt settingsOptionCount n c) }
-  T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = (Settings ((n `mod` settingsOptionCount) + 1)) }
-  T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = (Settings (((n - 2) `mod` settingsOptionCount) + 1)) }
+  T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = Settings $ keyToInt settingsOptionCount n c }
+  T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = Settings ((n + 1) `mod` settingsOptionCount) }
+  T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = Settings ((n - 1) `mod` settingsOptionCount) }
   _                                  -> continue s
 
 -------------------------------------------------------------------------------
@@ -111,11 +112,11 @@ settingsSelect gs@(GS _ _ sl) n = case n of
   0 -> gs { setting = sl { colorScheme = (((colorScheme sl) `mod` colorSchemeCount) + 1) } } -- update colors
   1 -> gs { setting = sl { diskChar    = (((diskChar sl) `mod` diskCharCount) + 1) } } -- update chars
   2 -> gs { setting = sl { diskShape   = (((diskShape sl) `mod` diskShapeCount) + 1) } } -- update shape
-  3 -> gs { state = initMainMenu } -- Back to main menu
+  3 -> gs { state = MainMenu 3 } -- Back to main menu
   _ -> gs -- Impossible State
 
 -- Args: max value, default value, char
 keyToInt :: Int -> Int -> Char -> Int
 keyToInt m n c = if (k > 0) && (k <= m) then k else n
   where
-    k = fromEnum c - fromEnum '0'
+    k = fromEnum c - fromEnum '1'

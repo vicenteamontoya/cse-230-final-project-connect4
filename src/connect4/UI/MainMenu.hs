@@ -1,12 +1,12 @@
-module UI.MainMenu (view, nOptions) where
+module UI.MainMenu (view, nMenuOptions) where
 
 import Brick
 import Graphics.Vty
 import UI.Resources
 import qualified Data.List as L
 
-nOptions :: Int
-nOptions = length options
+nMenuOptions :: Int
+nMenuOptions = length options
 
 options :: [String]
 options =
@@ -18,7 +18,7 @@ options =
   ]
 
 buildOptions :: Int -> [Widget String]
-buildOptions n = [mkOption n i | i <- [0..(nOptions-1)]]
+buildOptions n = [mkOption n i | i <- [0..(nMenuOptions-1)]]
 
 mkOption :: Int -> Int -> Widget String
 mkOption n i
