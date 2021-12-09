@@ -38,6 +38,7 @@ data PlayState = PS
   }
 
 data Player = Local | Server
+  deriving (Eq)
 
 data EndMenuState = EMS
   { emRes    :: Int             -- ^ game result (change type?)

@@ -21,7 +21,7 @@ control s@(GS (Play p) conn _) ev = case ev of
   T.VtyEvent (V.EvKey V.KEnter _)    -> case play p of
     Retry -> continue s
     _     -> do
-      liftIO $ WS.sendTextData conn (pack $ show $ psCol p) -- Send column number
+      liftIO $ if psR p == Local && psB p == Local then return () else WS.sendTextData conn (pack $ show $ psCol p) -- Send column number
       nextGameS p s $ play p
   T.VtyEvent (V.EvKey V.KLeft _)     -> continue s { state = (Play (move left p)) }
   T.VtyEvent (V.EvKey V.KRight _)    -> continue s { state = (Play (move right p)) }
