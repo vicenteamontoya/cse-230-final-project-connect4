@@ -38,7 +38,7 @@ control s@(GS (MainMenu n) conn _) ev = case ev of
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = MainMenu ((n - 1) `mod` mainMenuOptionCount) }
   _                                  -> continue s
 control s@(GS (EndMenu (EMS r n)) _ _) ev = case ev of
-  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 3 then halt s else continue s { state = (endMenuSelect n) }
+  T.VtyEvent (V.EvKey V.KEnter _)    -> if n == 2 then halt s else continue s { state = (endMenuSelect n) }
   T.VtyEvent (V.EvKey (V.KChar c) _) -> continue s { state = EndMenu $ EMS r (keyToInt endMenuOptionCount n c) }
   T.VtyEvent (V.EvKey V.KDown _)     -> continue s { state = EndMenu $ EMS r ((n + 1) `mod` endMenuOptionCount) }
   T.VtyEvent (V.EvKey V.KUp _)       -> continue s { state = EndMenu $ EMS r ((n - 1) `mod` endMenuOptionCount) }

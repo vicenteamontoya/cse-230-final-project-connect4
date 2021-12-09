@@ -26,6 +26,7 @@ options :: [String]
 options =
   [ "Main Menu"
   , "Settings"
+  , "Quit"
   ]
 
 buildOptions :: Int -> [Widget String]
