@@ -69,15 +69,15 @@ initMultiplayerGame str = Play $ PS
   }
 
 initSettings :: State
-initSettings = Settings 1
+initSettings = Settings 0
 
 initMainMenu :: State
-initMainMenu = MainMenu 1
+initMainMenu = MainMenu 0
 
 initEndMenu :: Int -> State
 initEndMenu n = EndMenu $ EMS
   { emRes    = n
-  , emSel    = 1 
+  , emSel    = 0 
   }
 
 initSettingsList :: SettingsList
