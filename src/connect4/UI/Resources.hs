@@ -99,6 +99,12 @@ settingsOptions =
   , "Return to Menu"
   ]
 
+loadingText :: String
+loadingText = "\
+  \Waiting for the other player... \n\
+  \Press `esc` to quit.\n\
+  \"
+
 settingsThemeOptions :: [String]
 settingsThemeOptions =
    [ let (v1, v2) = getAttrString i in v1 ++ " / " ++ v2 | i <- [0..3] ]  
