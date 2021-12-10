@@ -52,7 +52,8 @@ test-suite tests
   hs-source-dirs:    tests
   ghc-options:       -W -threaded
   main-is:           Test.hs
-  hs-source-dirs:    tests
+  hs-source-dirs:    tests,
+                     src/connect4
   other-modules:     Common
   build-depends:     base >=4.9, 
                      containers, 
@@ -62,4 +63,9 @@ test-suite tests
                      tasty,
                      tasty-hunit,
                      tasty-quickcheck,
-                     process
+                     process,
+                     vty, 
+                     brick,
+                     network,
+                     websockets,
+                     text

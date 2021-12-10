@@ -7,7 +7,7 @@ import System.Exit
 import Test.Tasty
 import Common
 import Test.QuickCheck
-
+import UI.Resources
 
 main :: IO ()
 main = runTests 
@@ -17,7 +17,9 @@ main = runTests
 
 manualTests ::  Score -> TestTree
 manualTests sc = testGroup "Manual Tests" 
-  [ scoreTest ((\_ -> 1+1),  (), 2, 0, "test-add") 
+  [ scoreTest ((\_ -> 1+1),  (), 2, 0, "test-add"), 
+    scoreTest ((\x -> split x '\n'),  "a\nb\nc\n", ["a","b","c"], 0, "test-split-helper-1"),
+    scoreTest ((\x -> split x '$'),  "a$b$c$", ["a","b","c"], 0, "test-split-helper-2")
   ]
   where
     scoreTest :: (Show b, Eq b) => (a -> b, a, b, Int, String) -> TestTree
