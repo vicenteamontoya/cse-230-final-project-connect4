@@ -1,4 +1,4 @@
-module View (view, colorSchemeCount, discCharCount, discShapeCount) where
+module View (view) where
 
 import Brick
 
@@ -20,12 +20,3 @@ view gs@(GS st _ sl) = case st of
   Instructions -> I.view
   EndMenu e -> E.view e sl
   Settings n -> S.view sl n
-
-colorSchemeCount :: Int
-colorSchemeCount = 5
-
-discCharCount :: Int
-discCharCount = 5
-
-discShapeCount :: Int
-discShapeCount = 5

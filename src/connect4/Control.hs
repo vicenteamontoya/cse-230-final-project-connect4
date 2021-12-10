@@ -9,7 +9,7 @@ import Data.Text
 
 import Model
 import Model.Board
-import View
+
 
 -------------------------------------------------------------------------------
 

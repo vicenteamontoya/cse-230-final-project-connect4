@@ -16,7 +16,7 @@ title = "\
 \██ ▄▄ ▄█▀▄ ▐█▐▐▌▐█▐▐▌▐▀▀▪▄██ ▄▄ ▐█.▪    ██▪  ▄█▀▄ █▌▐█▌▐▀▀▄ \n\
 \▐███▌▐█▌.▐▌██▐█▌██▐█▌▐█▄▄▌▐███▌ ▐█▌·    ██▌.▐█▌.▐▌▐█▄█▌▐█•█▌\n\
 \·▀▀▀  ▀█▄▀▪▀▀ █▪▀▀ █▪ ▀▀▀ ·▀▀▀  ▀▀▀     ▀▀▀  ▀█▄▀▪ ▀▀▀ .▀  ▀\n\
-\" 
+\"
 
 disc :: String
 disc = "\
@@ -77,6 +77,12 @@ settingsOptions =
   , "Disc Shape"
   ]
 
+settingsThemeOptions :: [String]
+settingsThemeOptions =
+  [ ""
+
+  ]
+
 newline :: Char
 newline = chr 10
 
@@ -93,11 +99,11 @@ winResult = " won the game!"
 -------------------------------------------------------------------------------
 
 split :: String -> Char -> [String]
-split s c = if length cleanSuffix > 0 then [prefix] ++ (split cleanSuffix c) else [prefix]
+split s c = if not (null cleanSuffix) then prefix : (split cleanSuffix c) else [prefix]
   where
     (prefix, suffix) = break (== c) s
-    cleanSuffix      = tail suffix 
-    
+    cleanSuffix      = tail suffix
+
 -------------------------------------------------------------------------------
 -- Attributes
 -------------------------------------------------------------------------------
@@ -128,14 +134,14 @@ yellowAttr  = attrName "Yellow"
 magentaAttr = attrName "Magenta"
 cyanAttr    = attrName "Cyan"
 
-getAttr :: Int -> (AttrName, AttrName) 
+getAttr :: Int -> (AttrName, AttrName)
 getAttr 0 = (redAttr, blueAttr)
 getAttr 1 = (redAttr, yellowAttr)
 getAttr 2 = (greenAttr, yellowAttr)
 getAttr 3 = (magentaAttr, cyanAttr)
 getAttr _ = (redAttr, blueAttr)
 
-getAttrString :: Int -> (String, String) 
+getAttrString :: Int -> (String, String)
 getAttrString 0 = ("Red", "Blue")
 getAttrString 1 = ("Red", "Yellow")
 getAttrString 2 = ("Green", "Yellow")

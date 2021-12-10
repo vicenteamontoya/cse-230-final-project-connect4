@@ -97,5 +97,14 @@ endMenuOptionCount = 3
 settingsOptionCount :: Int
 settingsOptionCount = 4
 
+colorSchemeCount :: Int
+colorSchemeCount = 4
+
+discCharCount :: Int
+discCharCount = 2
+
+discShapeCount :: Int
+discShapeCount = 2
+
 isCurr :: PlayState -> Int -> Bool
 isCurr s c = (psCol s) == c
