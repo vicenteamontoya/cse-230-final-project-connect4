@@ -16,7 +16,7 @@ import View
 control :: GlobalState -> BrickEvent n Tick -> EventM n (Next GlobalState)
 control s (T.VtyEvent (V.EvKey V.KEsc _)) = halt s -- Esc to Quit Game anytime
 control s@(GS (Play p) conn _) ev = case ev of
-  AppEvent (Tick "LEFT")             -> continue s { state = (initEndMenu (-1)) } -- Other player leaves
+  AppEvent (Tick "LEFT")             -> continue s { state = (initEndMenu (0)) } -- Other player leaves
   AppEvent (Tick msg)                -> nextGameS p s $ playServer p (read msg) -- Receive column number
   T.VtyEvent (V.EvKey V.KEnter _)    -> case play p of
     Retry -> continue s
