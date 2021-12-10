@@ -1,12 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
--- import Data.Char (isPunctuation, isSpace)
--- import Data.Monoid (mappend)
 import Data.Text (Text, pack)
 import Control.Exception (finally)
 import Control.Monad (forM_, forever)
-import Control.Concurrent (MVar, newMVar, modifyMVar_, readMVar)
+import Control.Concurrent (forkIO, MVar, newMVar, modifyMVar_, readMVar)
 import System.Random (randomIO)
+import Network.Socket (withSocketsDo)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Network.WebSockets as WS
@@ -41,12 +40,6 @@ broadcast :: Text -> ServerState -> IO ()
 broadcast message clients = do
     T.putStrLn ("Broadcast " <> message)
     forM_ (fst clients) $ \(_, conn) -> WS.sendTextData conn message
-
--- Main function
-main :: IO ()
-main = do
-    state <- newMVar newServerState
-    WS.runServer "127.0.0.1" 9160 $ application state
 
 -- Serve incoming connections
 application :: MVar ServerState -> WS.ServerApp
@@ -116,4 +109,10 @@ talk (uid, conn) state = forever $ do
                 let s' = (fst s, (opp + 2)) in return s'
         else 
             return ()
+
+-- Main function
+main :: IO ()
+main = do
+    state <- newMVar newServerState
+    WS.runServer "127.0.0.1" 9160 $ application state
 
