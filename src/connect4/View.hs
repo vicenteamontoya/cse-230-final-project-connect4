@@ -1,4 +1,4 @@
-module View (view, colorSchemeCount, diskCharCount, diskShapeCount) where
+module View (view, colorSchemeCount, discCharCount, discShapeCount) where
 
 import Brick
 
@@ -24,8 +24,8 @@ view gs@(GS st _ sl) = case st of
 colorSchemeCount :: Int
 colorSchemeCount = 5
 
-diskCharCount :: Int
-diskCharCount = 5
+discCharCount :: Int
+discCharCount = 5
 
-diskShapeCount :: Int
-diskShapeCount = 5
+discShapeCount :: Int
+discShapeCount = 5

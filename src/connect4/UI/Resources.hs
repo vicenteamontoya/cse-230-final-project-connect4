@@ -70,6 +70,13 @@ mainMenuOptions =
   , "Quit"
   ]
 
+settingsOptions :: [String]
+settingsOptions =
+  [ "Disc Color Theme"
+  , "Disc Character"
+  , "Disc Shape"
+  ]
+
 newline :: Char
 newline = chr 10
 

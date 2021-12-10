@@ -47,8 +47,8 @@ data EndMenuState = EMS
 
 data SettingsList = SL
   { colorScheme :: Int
-  , diskChar    :: Int
-  , diskShape   :: Int
+  , discChar    :: Int
+  , discShape   :: Int
   }
 
 initLocalGame :: State
@@ -84,8 +84,8 @@ initEndMenu n = EndMenu $ EMS
 initSettingsList :: SettingsList
 initSettingsList = SL
   { colorScheme = 0
-  , diskChar    = 0
-  , diskShape   = 0
+  , discChar    = 0
+  , discShape   = 0
   }
 
 mainMenuOptionCount :: Int

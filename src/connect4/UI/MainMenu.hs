@@ -1,11 +1,10 @@
 module UI.MainMenu (view, nMenuOptions) where
 
 import Brick
-import Brick.Widgets.Center (center, hCenter)
 import Graphics.Vty
 import UI.Resources
-import Brick.Types
-import qualified Data.List as L
+import Brick.Widgets.Center
+
 
 view :: Int -> [Widget String]
 view n = [v]

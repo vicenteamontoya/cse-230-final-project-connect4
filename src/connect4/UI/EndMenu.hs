@@ -1,11 +1,10 @@
 module UI.EndMenu (view) where
 
 import Brick
-import Brick.Widgets.Center (center, hCenter)
+import Brick.Widgets.Center
 import Model
 import Graphics.Vty
 import UI.Resources
-import qualified Data.List as L
  
 view :: EndMenuState -> SettingsList -> [Widget String]
 view state settings = [v]

@@ -1,11 +1,9 @@
 module UI.Instructions (view) where
 
 import Brick
-import Brick.Widgets.Center (center, hCenter)
-import Graphics.Vty
+import Brick.Widgets.Center
 import UI.Resources
-import Brick.Types
-import qualified Data.List as L
+
 
 view :: [Widget String]
 view = [v]
