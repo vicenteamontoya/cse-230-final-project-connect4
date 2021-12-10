@@ -49,12 +49,13 @@ executable connect4-server
 test-suite tests
   default-language: Haskell98
   type:              exitcode-stdio-1.0
-  hs-source-dirs:    tests
   ghc-options:       -W -threaded
   main-is:           Test.hs
   hs-source-dirs:    tests,
                      src/connect4
-  other-modules:     Common
+  other-modules:     Common,
+                     Model.Board,
+                     UI.Resources
   build-depends:     base >=4.9, 
                      containers, 
                      mtl,
