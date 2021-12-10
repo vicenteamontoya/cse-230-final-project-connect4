@@ -65,6 +65,7 @@ gameControls = "\
   \Press `enter` to select a column and drop a disc of your color. \n\
   \Press `left` or `right` keys to change selected column. \n\
   \Press `esc` to quit.\n\
+  \Press `left` on this page to return to the Main Menu.\n\
   \"
 
 endGameOptions :: [String]

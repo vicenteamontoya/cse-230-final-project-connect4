@@ -90,13 +90,13 @@ initSettingsList = SL
   }
 
 mainMenuOptionCount :: Int
-mainMenuOptionCount = 5
+mainMenuOptionCount = length mainMenuOptions
 
 endMenuOptionCount :: Int
-endMenuOptionCount = 3
+endMenuOptionCount = length endGameOptions
 
 settingsOptionCount :: Int
-settingsOptionCount = 4
+settingsOptionCount = length settingsOptions
 
 colorSchemeCount :: Int
 colorSchemeCount = length settingsThemeOptions
