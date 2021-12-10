@@ -19,15 +19,6 @@ title = "\
 \" 
 
 disc :: String
--- disc = "\
--- \    ████    \n\
--- \ ██████████ \n\
--- \████████████\n\
--- \████████████\n\
--- \ ██████████ \n\
--- \    ████    \n\
--- \"
-
 disc = "\
 \    ****    \n\     
 \ ********** \n\    
@@ -37,11 +28,40 @@ disc = "\
 \    ****    \n\
 \"
 
+menuInstructions:: String
+menuInstructions = "\
+  \Press `enter` to select item. \n\
+  \Press `up` or `down` keys to change selected option. \n\
+  \Press `esc` to quit.\n\
+  \"
+
+endGameOptions :: [String]
+endGameOptions =
+  [ "Main Menu"
+  , "Settings"
+  , "Quit"
+  ]
+
+mainMenuOptions :: [String]
+mainMenuOptions =
+  [ "Local Game"
+  , "Multiplayer Game"
+  , "Instructions"
+  , "Settings"
+  , "Quit"
+  ]
+
 newline :: Char
 newline = chr 10
 
 cellHeight :: Int
 cellHeight = 6
+
+drawResult :: String
+drawResult = "There was a draw!"
+
+winResult :: String
+winResult = " won the game!"
 -------------------------------------------------------------------------------
 -- Helper methods
 -------------------------------------------------------------------------------
@@ -81,3 +101,17 @@ greenAttr   = attrName "Green"
 yellowAttr  = attrName "Yellow"
 magentaAttr = attrName "Magenta"
 cyanAttr    = attrName "Cyan"
+
+getAttr :: Int -> (AttrName, AttrName) 
+getAttr 0 = (redAttr, blueAttr)
+getAttr 1 = (redAttr, yellowAttr)
+getAttr 2 = (greenAttr, yellowAttr)
+getAttr 3 = (magentaAttr, cyanAttr)
+getAttr _ = (redAttr, blueAttr)
+
+getAttrString :: Int -> (String, String) 
+getAttrString 0 = ("Red", "Blue")
+getAttrString 1 = ("Red", "Yellow")
+getAttrString 2 = ("Green", "Yellow")
+getAttrString 3 = ("Magenta", "Cyan")
+getAttrString _ = ("Red", "Blue")

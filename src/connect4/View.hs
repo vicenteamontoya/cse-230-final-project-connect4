@@ -18,7 +18,7 @@ view gs@(GS st _ sl) = case st of
   MainMenu n -> M.view n
   Loading -> L.view
   Instructions -> I.view
-  EndMenu e -> E.view e
+  EndMenu e -> E.view e sl
   Settings n -> S.view sl n
 
 colorSchemeCount :: Int
