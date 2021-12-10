@@ -12,8 +12,8 @@ import Graphics.Vty hiding (dim)
 
 import UI.Resources
 
-view :: PlayState -> [Widget String]
-view s = [v]
+view :: PlayState -> SettingsList -> [Widget String]
+view s sl = [v]
   where v = name <=> (withBorderStyle unicodeBold $
               borderWithLabel (header s) $
               vTile ((vLimit cellHeight) <$> ([ mkRow s row | row <- [1..height] ])))

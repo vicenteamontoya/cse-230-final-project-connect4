@@ -26,7 +26,8 @@ executable connect4
                        UI.Loading,
                        UI.Play,
                        UI.EndMenu,
-                       UI.Resources
+                       UI.Resources,
+                       UI.Settings
            
   default-language:    Haskell2010
   ghc-options:       -W -threaded

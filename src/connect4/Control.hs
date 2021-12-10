@@ -109,9 +109,9 @@ endMenuSelect n = case n of
 
 settingsSelect :: GlobalState -> Int -> GlobalState
 settingsSelect gs@(GS _ _ sl) n = case n of
-  0 -> gs { setting = sl { colorScheme = (((colorScheme sl) `mod` colorSchemeCount) + 1) } } -- update colors
-  1 -> gs { setting = sl { diskChar    = (((diskChar sl) `mod` diskCharCount) + 1) } } -- update chars
-  2 -> gs { setting = sl { diskShape   = (((diskShape sl) `mod` diskShapeCount) + 1) } } -- update shape
+  0 -> gs { setting = sl { colorScheme = (colorScheme sl + 1) `mod` colorSchemeCount } } -- update colors
+  1 -> gs { setting = sl { diskChar    = (diskChar    sl + 1) `mod` diskCharCount    } } -- update chars
+  2 -> gs { setting = sl { diskShape   = (diskShape   sl + 1) `mod` diskShapeCount   } } -- update shape
   3 -> gs { state = MainMenu 3 } -- Back to main menu
   _ -> gs -- Impossible State
 

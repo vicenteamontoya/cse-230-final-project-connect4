@@ -83,9 +83,9 @@ initEndMenu n = EndMenu $ EMS
 
 initSettingsList :: SettingsList
 initSettingsList = SL
-  { colorScheme = 1
-  , diskChar    = 1
-  , diskShape   = 1
+  { colorScheme = 0
+  , diskChar    = 0
+  , diskShape   = 0
   }
 
 mainMenuOptionCount :: Int
