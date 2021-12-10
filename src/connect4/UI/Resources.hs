@@ -31,6 +31,16 @@ chrDisc c =
   , ' ', ' ', ' ', ' ', c, c, c, c, ' ', ' ', ' ', ' ', '\n'
   ]
 
+chrRect :: Char -> String
+chrRect c = 
+  [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n'
+  , ' ',   c,   c,   c,   c,   c,   c,   c,   c,   c,   c, ' ', '\n'
+  , ' ',   c,   c,   c,   c,   c,   c,   c,   c,   c,   c, ' ', '\n'
+  , ' ',   c,   c,   c,   c,   c,   c,   c,   c,   c,   c, ' ', '\n'
+  , ' ',   c,   c,   c,   c,   c,   c,   c,   c,   c,   c, ' ', '\n'
+  , ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n'
+  ]
+
 menuInstructions:: String
 menuInstructions = "\
   \Press `enter` to select option. \n\
@@ -92,11 +102,15 @@ settingsThemeOptions :: [String]
 settingsThemeOptions =
    [ let (v1, v2) = getAttrString i in v1 ++ " / " ++ v2 | i <- [0..3] ]  
 
+-- just add more characters here to support more options
 settingsCharOptions :: [Char]
-settingsCharOptions = ['*', '-']
+settingsCharOptions = ['*', '~', '#', '%']
 
 settingsShapeOptions :: [String]
-settingsShapeOptions = ["Circle", "Square"]
+settingsShapeOptions = ["Circle", "Rectangle"]
+
+shapeFunctions :: [Char -> String]
+shapeFunctions = [chrDisc, chrRect]
 
 newline :: Char
 newline = chr 10

@@ -5,6 +5,7 @@ import Prelude
 import qualified Network.WebSockets as WS
 
 import qualified Model.Board  as Board
+import UI.Resources
 
 -------------------------------------------------------------------------------
 -- | Ticks mark passing of time: a custom event that we constantly stream
@@ -98,13 +99,13 @@ settingsOptionCount :: Int
 settingsOptionCount = 4
 
 colorSchemeCount :: Int
-colorSchemeCount = 4
+colorSchemeCount = length settingsThemeOptions
 
 discCharCount :: Int
-discCharCount = 2
+discCharCount = length settingsCharOptions
 
 discShapeCount :: Int
-discShapeCount = 2
+discShapeCount = length settingsShapeOptions
 
 isCurr :: PlayState -> Int -> Bool
 isCurr s c = (psCol s) == c

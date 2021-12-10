@@ -13,10 +13,10 @@ import Graphics.Vty hiding (dim)
 import UI.Resources
 
 view :: PlayState -> SettingsList -> [Widget String]
-view s _ = [v]
+view s sl = [v]
   where v = name <=> (withBorderStyle unicodeBold $
               borderWithLabel (header s) $
-              vTile ((vLimit cellHeight) <$> ([ mkRow s row | row <- [1..height] ])))
+              vTile ((vLimit cellHeight) <$> ([ mkRow s row sl | row <- [1..height] ])))
 
 header :: PlayState -> Widget n
 header s =  str (printf "Connect4 Turn = %s, col = %d" (show (psTurn s)) (psCol s))
@@ -24,33 +24,41 @@ header s =  str (printf "Connect4 Turn = %s, col = %d" (show (psTurn s)) (psCol 
 name :: Widget n
 name = center (vBox (str <$> (split title newline)))
 
-mkRow :: PlayState -> Int -> Widget n
-mkRow s row = hTile [ mkCell s row i | i <- [1..width] ]
+mkRow :: PlayState -> Int -> SettingsList -> Widget n
+mkRow s row sl = hTile [ mkCell s row i sl | i <- [1..width] ]
 
-mkCell :: PlayState -> Int -> Int -> Widget n
-mkCell s r c 
+mkCell :: PlayState -> Int -> Int -> SettingsList -> Widget n
+mkCell s r c sl
   | isCurr s c   = withCursor raw 
   | otherwise    = raw 
   where
-    raw = mkCell' s r c
+    raw = mkCell' s r c sl
 
-mkCell' :: PlayState -> Int -> Int -> Widget n
-mkCell' s r c = center (mkDisc disc)
+mkCell' :: PlayState -> Int -> Int -> SettingsList -> Widget n
+mkCell' s r c sl = center (mkDisc disc sl)
   where 
-    disc      = psBoard s ! Pos r c
+    disc         = psBoard s ! Pos r c
 
 withCursor :: Widget n -> Widget n
 withCursor = modifyDefAttr (`withBackColor` gray)
 
-mkDisc :: Maybe RB -> Widget n
+mkDisc :: Maybe RB -> SettingsList -> Widget n
 mkDisc Nothing  = discBlank
 mkDisc (Just R) = discRed
 mkDisc (Just B) = discBlue
 
-discBlank, discRed, discBlue :: Widget n
-discBlank = vBox (replicate 6 (str "     "))
-discRed   = withAttr redAttr (vBox (str <$> (split disc newline)))
-discBlue  = withAttr blueAttr (vBox (str <$> (split disc newline)))
+discBlank, discRed, discBlue :: SettingsList -> Widget n
+discBlank _  = vBox (replicate 6 (str "     "))
+discRed   sl = withAttr c1 (vBox (str <$> (split discStr newline)))
+  where 
+    (c1,_) = getAttr $ colorScheme sl
+    char    = settingsCharOptions !! discChar sl
+    discStr = (shapeFunctions !! discShape sl) char
+discBlue  sl = withAttr c2 (vBox (str <$> (split discStr newline)))
+  where 
+    (_,c2) = getAttr $ colorScheme sl
+    char    = settingsCharOptions !! discChar sl
+    discStr = (shapeFunctions !! discShape sl) char
 
 vTile :: [Widget n] -> Widget n
 vTile (b:bs) = vBox (b : [hBorder <=> b | b <- bs])
