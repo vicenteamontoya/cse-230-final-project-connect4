@@ -19,14 +19,17 @@ title = "\
 \"
 
 disc :: String
-disc = "\
-\    ****    \n\     
-\ ********** \n\    
-\************\n\  
-\************\n\   
-\ ********** \n\   
-\    ****    \n\
-\"
+disc = chrDisc '*'
+
+chrDisc :: Char -> String
+chrDisc c = 
+  [ ' ', ' ', ' ', ' ', c, c, c, c, ' ', ' ', ' ', ' ', '\n'
+  , ' ',   c,   c,   c, c, c, c, c,   c,   c,   c, ' ', '\n'
+  ,   c,   c,   c,   c, c, c, c, c,   c,   c,   c,   c, '\n'
+  ,   c,   c,   c,   c, c, c, c, c,   c,   c,   c,   c, '\n'
+  , ' ',   c,   c,   c, c, c, c, c,   c,   c,   c, ' ', '\n'
+  , ' ', ' ', ' ', ' ', c, c, c, c, ' ', ' ', ' ', ' ', '\n'
+  ]
 
 menuInstructions:: String
 menuInstructions = "\
@@ -70,18 +73,30 @@ mainMenuOptions =
   , "Quit"
   ]
 
+optionsControls :: String
+optionsControls = "\
+  \Press `enter` to cycle through the highlighted option. \n\
+  \Press `up` or `down` keys to change selected option. \n\
+  \Press `esc` to quit.\n\
+  \"
+
 settingsOptions :: [String]
 settingsOptions =
   [ "Disc Color Theme"
   , "Disc Character"
   , "Disc Shape"
+  , "Return to Menu"
   ]
 
 settingsThemeOptions :: [String]
 settingsThemeOptions =
-  [ ""
+   [ let (v1, v2) = getAttrString i in v1 ++ " / " ++ v2 | i <- [0..3] ]  
 
-  ]
+settingsCharOptions :: [Char]
+settingsCharOptions = ['*', '-']
+
+settingsShapeOptions :: [String]
+settingsShapeOptions = ["Circle", "Square"]
 
 newline :: Char
 newline = chr 10
