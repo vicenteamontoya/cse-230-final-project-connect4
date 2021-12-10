@@ -30,8 +30,27 @@ disc = "\
 
 menuInstructions:: String
 menuInstructions = "\
-  \Press `enter` to select item. \n\
+  \Press `enter` to select option. \n\
   \Press `up` or `down` keys to change selected option. \n\
+  \Press `left` to return to previous menu. \n\
+  \Press `esc` to quit.\n\
+  \"
+
+
+gameInstructions :: String
+gameInstructions = "\
+\ Connect Four is a two-player board game played on a grid with seven columns \n\
+\ and six rows. First, each player picks a color. On each player's turn, the  \n\
+\ player chooses a column to drop a disc of their color. The disc will drop to\n\
+\ the lowest available row within the column. The objective of the game is to \n\
+\ be the first player to form a horizontal, vertical, or diagonal line of four\n\
+\ of one's own discs. \n\
+\"
+
+gameControls :: String
+gameControls = "\
+  \Press `enter` to select a column and drop a disc of your color. \n\
+  \Press `left` or `right` keys to change selected column. \n\
   \Press `esc` to quit.\n\
   \"
 
