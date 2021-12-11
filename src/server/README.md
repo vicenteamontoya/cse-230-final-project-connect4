@@ -13,6 +13,7 @@
  - `Run:` ./Main
  - `Test:` stack ghc Test.hs && ./Test
  - Run the server first before running the clients
+ - NOTE: Since server is built and run separately, make sure to install the dependencies mentioned in the root README.
 
 ## Tests
 
