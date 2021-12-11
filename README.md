@@ -1,5 +1,18 @@
 # CSE 230 Final Project: Connect 4
 
+## Directories
+
+- `src/server` has server code
+- `src/connect4` has client code
+
+## Instructions
+
+ - Running: 
+   - First follow instructions for running `Main` in the [README](src/server/README.md) for server
+   - Then, `stack run` from the root of this directory
+ - Testing:
+   - Run `stack test` from the root of this directory
+
 ## Team Members
  - Shubham Bhargava
  - Teja Dhondu
