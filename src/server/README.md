@@ -13,3 +13,9 @@
  - `Run:` ./Main
  - `Test:` stack ghc Test.hs && ./Test
  - Run the server first before running the clients
+
+## Tests
+
+ - `Basic Test:` Verifies basic back and forth forwarding of messages between clients
+ - `Leave Test:` If a client leaves during a game, verifies that other client receives end of game message
+ - `Turn Test:` Verifies that if a client sends a move out of turn, that move is not propogated. While client side code also checks this, having the server perform this check adds extra fault tolerance 
